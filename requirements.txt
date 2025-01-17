@@ -3,3 +3,4 @@ flask-wtf
 flask-bcrypt
 flask-login
 flask-session
+minio
