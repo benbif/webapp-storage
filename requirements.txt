@@ -5,3 +5,5 @@ flask-login
 flask-session
 minio
 email_validator
+flask-mail
+itsdangerous
