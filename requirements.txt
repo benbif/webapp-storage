@@ -7,3 +7,4 @@ minio
 email_validator
 flask-mail
 itsdangerous
+mailjet-rest
