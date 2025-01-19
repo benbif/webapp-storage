@@ -1,7 +1,27 @@
 {% extends "base.html" %}
-{% block title %}Dashboard{% endblock %}
+
 {% block content %}
-    <h1>Benvenuto, {{ username }}!</h1>
-    <p>Questa è la tua area riservata.</p>
-    <a href="{{ url_for('logout') }}">Logout</a>
+<div class="container mt-5">
+    <h2>Dashboard</h2>
+    <div class="d-flex justify-content-center mb-3">
+        <button class="btn btn-primary me-2">Accesso Sala</button>
+        <button class="btn btn-success">Prenota Sala</button>
+    </div>
+    <div id="calendar"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'it',
+            events: {{ events | tojson }},
+            eventClick: function(info) {
+                alert("Evento: " + info.event.title);
+            }
+        });
+        calendar.render();
+    });
+</script>
 {% endblock %}

@@ -1,6 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+
 {% block content %}
-    <h1>Benvenuto nella Web App!</h1>
-    <p>Effettua il login o registrati per iniziare.</p>
+<div class="container text-center mt-5">
+    <h1>Benvenuto nella Web App</h1>
+    <img src="{{ url_for('static', filename='images/home-banner.jpg') }}" class="img-fluid mt-3" alt="Home Banner">
+</div>
 {% endblock %}
