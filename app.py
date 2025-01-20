@@ -19,12 +19,15 @@ app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
+app.config['REMEMBER_COOKIE_DURATION'] = 3600 * 24 * 7  # 7 giorni
+
+
 # Configura MinIO
 #MINIO_URL = "http://127.0.0.1:9000"
 MINIO_URL = "127.0.0.1:9000"  # Rimuovi "http://"
-MINIO_ACCESS_KEY = "k3ZnNJGIEiI2INiTOCNV"
+MINIO_ACCESS_KEY = "B6Sb8c5r0FGCGmNdF5Ha"
 #MINIO_SECRET_KEY = "minioadmin"
-MINIO_SECRET_KEY = "xcrH6qANDryky8GeOHn9tArGVtR9DUuUiPO2RZ5l"
+MINIO_SECRET_KEY = "6REASSwTyAjjMy7VbdmruNwcbsWtrwZBQCLJ8UqT"
 BUCKET_NAME = "users-storage"
 LOG_BUCKET_NAME = "user-logs"
 EVENTS_BUCKET_NAME = "events-storage"
@@ -114,6 +117,15 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Accedi')
 
 
+from wtforms import BooleanField
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Ricordami')  # ➡️ Aggiunto il checkbox "Ricordami"
+    submit = SubmitField('Accedi')
+
+
 
 
 @app.route('/')
@@ -136,19 +148,23 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data.encode('utf-8')
+        remember = form.remember.data  # ➡️ Otteniamo il valore del checkbox
+
         try:
             response = client.get_object(BUCKET_NAME, f"user_{email}.json")
             user_data = json.load(response)
             if bcrypt.checkpw(password, user_data["password"].encode('utf-8')):
                 user = User(email, user_data["nome"], user_data["email"])
-                login_user(user)
+                login_user(user, remember=remember)  # ➡️ Se "remember" è True, l'utente resta loggato
                 flash('Login effettuato con successo!', 'success')
                 return redirect(url_for('dashboard'))
             else:
                 flash('Credenziali errate. Riprova.', 'danger')
         except:
             flash('Utente non registrato.', 'danger')
+
     return render_template("login.html", form=form)
+
 
 
 
@@ -244,6 +260,11 @@ def inject_menu():
         {"name": "Dashboard", "url": url_for('dashboard') if current_user.is_authenticated else None},
         {"name": "Logout", "url": url_for('logout') if current_user.is_authenticated else None},
     ])
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
