@@ -251,6 +251,7 @@ def debug_users():
 
 
 
+
 @app.context_processor
 def inject_menu():
     return dict(menu_items=[
